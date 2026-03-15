@@ -6,22 +6,40 @@
 #include <conio.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 //---------------[EVENTOS]------------------//
 int game();
 int bets();
 int sorteio();
+int objs(int p);
 int ingame();
-int end(int opc);
+int end(int f);
 //---------------[GLOBAIS]------------------//
 int key,ran,players = 2,prize;
 
-char objs[10][9][20]{0};
+char objetos[11][20]{
+"",
+"serra",
+"pilula",
+"algema",
+"seila",
+"c",
+"s",
+"d",
+"f",
+"g",
+"h"
+};
+int obj[10][8]{0};
 int lifes[10]{1};
 int money[10]{0};
 int bet[10]{2};
 
 int balas[8]{0};
 int quant,verm;
+
+int opc = 0;
+bool sort[10] = {false};
 
 char frase[50] = "Buckshot roullete";//uma frase pra escrever aos poucos quando eu quiser
 
@@ -147,7 +165,7 @@ int bets()
 		{
 			printf("\033[4;10H");
 			scanf("%d",&bet[p]);
-		}while( bet[p]>money[p]);
+		}while( bet[p]>money[p] || bet[p] <= 0);
 		prize+=bet[p];
 		money[p] -= bet[p];
 		system("cls");
@@ -177,7 +195,8 @@ int sorteio()
 	}
    	
    	printf("%d blanks\n%d lives\n",quant-verm,verm);
-   	Sleep(5000);   	
+   	Sleep(5000);
+   	system("cls");
    	ingame();
    	
    	for(int r = 0;r<quant;r++)
@@ -189,46 +208,129 @@ int sorteio()
 
 int ingame()
 {
+	int acabou = 0;
+	opc = 1;
 	for(int p = 1;p<=quant;p++)
 	{
+		system("cls");
 		if(lifes[p] == 0)
 			continue;
 		
 		printf("jogador %d: \n",p);
+		
+		if(sort[p] == false)
+		{
+			objs(p);
+		}
 		printf("\nobjetos:");
 		for(int i = 1;i<=8;i++)
 		{
-			printf("\n%d:",i);
-			strcpy(objs[p][0],objs[p][i]);
-			for(int s = 0;objs[p][i][s] != '\0';s++)
+			if(opc == i)
 			{
-				printf("%c",objs[p][i][s]);
+				SetConsoleTextAttribute(hc,16+7);
 			}
+			else
+			{
+				SetConsoleTextAttribute(hc,7);
+			}
+
+			printf("\n%d:",i);
+			strcpy(frase,objetos[obj[p][i]]);
+			printf("%s",frase);
 		}
 		
+		if(opc == 9)
+		{
+			SetConsoleTextAttribute(hc,16+7);
+		}
+		else
+		{
+			SetConsoleTextAttribute(hc,7);
+		}
 		printf("\n\n[revolver]");
-		
-		printf("vidas:");
+		SetConsoleTextAttribute(hc,7);
+		printf("\n\nvidas: ");
 		for(int i = 0;i<lifes[p];i++)
 		{
 			printf("%c",3);
 		}
 		
-		key = getch();
+		key = tolower(getch());
 		
 		switch(key)
 		{
-			case 'w':
-				
+			case 's':
+				if(opc < 9)
+					opc++;
 			break;
+			
+			case 'w':
+				if(opc > 1)
+					opc--;
+			break;
+			
+			case 13:
+				switch(opc)
+				{
+					case 1 ... 8:
+						
+					break;
+					
+					case 9:
+						
+					break;
+				}
+			break;
+		}
+		
+		
+		
+		if(acabou == 1)
+		{
+			acabou = 0;
+			continue;
+		}
+		else
+		{
+			p--;
 		}
 	}
 }
+
+int objs(int p)
+{
+	
+	for(int i = 0; i<4;i++)
+	{
+		ran = 0;
+		for(int j = 1;j<=8;j++)
+		{
+			if(obj[p][j] == 0)
+			{
+				srand(time(NULL)* sqrt(i*j));
+				obj[p][j] = rand()%10+1;
+				printf("\nrecebeu: %s",objetos[obj[p][j]]);
+				break;
+			}
+			
+			else
+			{
+				ran++;
+			}
+		}
+		
+		key = getch();
+	}
+	sort[p] = true;
+	system("cls");
+}
+
+
 //---------------------------------------[fim do jogo e fim das apostas]-------------------------------------------//
 //-Eu n queria deixar uma linha quilométrica nos whiles(pra verificara cada player) ent eu coloquei meus fors aqui
-int end(int opc)
+int end(int f)
 {
-	switch(opc)
+	switch(f)
 	{
 		case 1:
 			for(int i = 1;i<=players;i++)
@@ -264,4 +366,4 @@ int end(int opc)
 
 
 
-
+//369
